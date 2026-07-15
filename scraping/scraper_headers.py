@@ -57,7 +57,10 @@ def scrape_headers(appdetails: list[str] = None, limit: int = 999999) -> dict[st
 
 
 if __name__ == "__main__":
+    initial_time = time.time()
+    print(f"STARTING AT {time.asctime()}")
     records = scrape_headers()
+    print(f"FINISHING AT {time.asctime()}  --  took {int(time.time() - initial_time)} seconds")
     print("DUMPING RECORDS INTO header_links.json")
     with open("header_links.json", 'w') as f:
         json.dump(records, f)

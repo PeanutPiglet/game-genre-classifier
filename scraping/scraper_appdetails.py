@@ -18,8 +18,9 @@ def scrape_at(ids: list[int]):
     
     n = len(ids)
     i = 0
+    retries = 0
     while i < n:
-        time.sleep(1.55)
+        time.sleep(1.5)
         curr_id = ids[i]
         full_url = f"{base_url}?appids={curr_id}&l=english&filters=basic,categories,genres,release_date"
         print(f"GET ?appids={curr_id}")
@@ -27,7 +28,13 @@ def scrape_at(ids: list[int]):
         if r.ok:
             data = r.json()[str(curr_id)]
             if not data["success"]:
-                print(f"UNSUCCESSFUL curr_id={curr_id}")
+                print(f"UNSUCCESSFUL curr_id={curr_id} status={r.status_code}")
+                retries += 1
+                if retries > 3:
+                    i += 1
+                    print("SKIPPED")
+                    continue
+                print(f"RETRYING {retries} / 3")
                 continue
             if data["data"]["type"] != "game":
                 print(f"NOT GAME @curr_id={curr_id}  --  SKIPPED")
@@ -36,14 +43,21 @@ def scrape_at(ids: list[int]):
             entry = {
                 "name": data["data"]["name"],
                 "header_image": data["data"]["header_image"],
-                "categories": data["data"]["categories"],
-                "genres": data["data"]["genres"],
+                "categories": data["data"]["categories"] if "categories" in data["data"] else [],
+                "genres": data["data"]["genres"] if "genres" in data["data"] else [],
                 "release_date": data["data"]["release_date"]
             }
             details[str(curr_id)] = entry
+            retries = 0
             i += 1
         else:
             print(r)
+            if r.status_code == 429:
+                retries += 1
+                extra_delay = max(60, min(10 * retries, 20))
+                print(f"429: TOO MANY REQUESTS  --  waiting {extra_delay} extra seconds")
+                time.sleep(extra_delay)
+            continue
 
     
     print(f"NUM ENTRIES IN PACKET : {len(details)} / {n}")
@@ -73,7 +87,10 @@ def scrape_appdetails(id_dumps: list[str] = None, limit: int = 999999):
     
 
 if __name__ == "__main__":
+    initial_time = time.time()
+    print(f"STARTING AT {time.asctime()}")
     scrape_appdetails()
+    print(f"FINISHING AT {time.asctime()}  --  TAKEN {int(time.time() - initial_time)} seconds")
 
 
 
