@@ -3,15 +3,17 @@ import requests
 import time
 
 
-START_APPID = 0
+DEFAULT_START_APPID = 0
+DEFAULT_BATCH_SIZE = 10000
+DEFAULT_BATCH_LIMIT = 10
 
 
-def scrape_at(key: str, start_id: int = 0) -> int:
+def scrape_at(key: str, start_id: int, batch_size: int) -> int:
     base_url = "https://partner.steam-api.com/IStoreService/GetAppList/v1/"
 
-    input_json = '{"max_results":50000}'
+    input_json = f'{{"max_results":{batch_size}}}'
     if start_id > 0:
-        input_json = '{"max_results":50000,"last_appid":' + str(start_id) + '}'
+        input_json = f'{{"max_results":{batch_size},"last_appid":{start_id}}}'
 
     full_url = f"{base_url}?key={key}&input_json={input_json}"
     print(f"GET {full_url}")
@@ -19,7 +21,7 @@ def scrape_at(key: str, start_id: int = 0) -> int:
     print(f"RESPONSE {r}")
     data = r.json()
 
-    with open(f"appids{start_id}.json", 'x') as f:
+    with open(f"appids/appids{start_id}.json", 'x') as f:
         json.dump(data, f, indent=4)
     print(f"DUMPED appids{start_id}.json")
 
@@ -30,17 +32,23 @@ def scrape_at(key: str, start_id: int = 0) -> int:
     return -1
 
 
-def scrape_appids():
+def scrape_appids(start_id: int = DEFAULT_START_APPID,
+                  batch_size = DEFAULT_BATCH_SIZE, batch_limit = DEFAULT_BATCH_LIMIT) -> list[str]:
     secrets = {}
     with open("../secrets.json") as f:
         secrets = json.load(f)
     publisher_key = secrets["steam-publisher-key"]
 
-    last_id = START_APPID
-    while last_id >= 0:
+    last_id = start_id
+    dumps = []
+    count = 0
+    while last_id >= 0 and count < batch_limit:
         time.sleep(1.6)
-        last_id = scrape_at(publisher_key, last_id)
-    return
+        count += 1
+        dumps.append(f"appids/appids{last_id}.json")
+        last_id = scrape_at(publisher_key, last_id, batch_size)
+
+    return dumps
 
 
 if __name__ == "__main__":
