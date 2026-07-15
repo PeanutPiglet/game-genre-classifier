@@ -25,6 +25,7 @@ def scrape_at(entries, records: dict[str, str]):
     os.makedirs(f"headers/headers{first}")
 
     for appid in entries:
+        time.sleep(0.2)
         print(f"GET @{appid}")
         header_url = entries[appid]["header_image"]
         r = requests.get(header_url)
@@ -56,7 +57,10 @@ def scrape_headers(appdetails: list[str] = None, limit: int = 999999) -> dict[st
 
 
 if __name__ == "__main__":
-    scrape_headers()
+    records = scrape_headers()
+    print("DUMPING RECORDS INTO header_links.json")
+    with open("header_links.json", 'w') as f:
+        json.dump(records, f)
 
 
 
