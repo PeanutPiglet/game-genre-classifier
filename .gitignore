@@ -220,3 +220,4 @@ __marimo__/
 # Custom
 secrets.json
 scraping/**/*.json
+scraping/**/*.jpg

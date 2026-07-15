@@ -1,0 +1,62 @@
+import json
+import requests
+import os
+import time
+
+
+def get_all_appdetails() -> list[str]:
+    dir_path = "appdetails/"
+    return ["appdetails/" + f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+
+
+def scrape_at(entries, records: dict[str, str]):
+    if len(entries) == 0:
+        print("WARNING: RECEIVED EMPTY entries  --  skipped")
+        return
+    initial_len_records = len(records)
+
+    first = ""
+    for appid in entries:
+        first = appid
+        break
+    if not first:
+        print(f"INVALID first : {first}")
+        return
+    os.makedirs(f"headers/headers{first}")
+
+    for appid in entries:
+        print(f"GET @{appid}")
+        header_url = entries[appid]["header_image"]
+        r = requests.get(header_url)
+        if r.ok:
+            out_path = f"headers/headers{first}/header{appid}.jpg"
+            with open(out_path, 'xb') as out:
+                out.write(r.content)
+                records[appid] = out_path
+        else:
+            print(r)
+    print(f"HEADERS SAVED : {len(records) - initial_len_records} / {len(entries)}")
+    return
+
+
+def scrape_headers(appdetails: list[str] = None, limit: int = 999999) -> dict[str, str]:
+    if not appdetails:
+        appdetails = get_all_appdetails()
+
+    records = {}
+    index = 0
+    while index < len(appdetails) and index < limit:
+        curr = appdetails[index]
+        with open(curr, 'r') as f:
+            data = json.load(f)
+            scrape_at(data, records)
+        index += 1
+
+    return records
+
+
+if __name__ == "__main__":
+    scrape_headers()
+
+
+
