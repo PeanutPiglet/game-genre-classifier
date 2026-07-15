@@ -1,11 +1,12 @@
 import json
 import requests
 import os
+import time
 
 
 def get_all_dumps() -> list[str]:
     dir_path = "appids/"
-    return [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+    return ["appids/" + f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
 
 def scrape_at(ids: list[int]):
@@ -15,7 +16,11 @@ def scrape_at(ids: list[int]):
     base_url = "https://store.steampowered.com/api/appdetails/"
     details = {}
     
-    for curr_id in ids:
+    n = len(ids)
+    i = 0
+    while i < n:
+        time.sleep(1.55)
+        curr_id = ids[i]
         full_url = f"{base_url}?appids={curr_id}&l=english&filters=basic,categories,genres,release_date"
         print(f"GET ?appids={curr_id}")
         r = requests.get(full_url)
@@ -26,6 +31,7 @@ def scrape_at(ids: list[int]):
                 continue
             if data["data"]["type"] != "game":
                 print(f"NOT GAME @curr_id={curr_id}  --  SKIPPED")
+                i += 1
                 continue
             entry = {
                 "name": data["data"]["name"],
@@ -35,13 +41,15 @@ def scrape_at(ids: list[int]):
                 "release_date": data["data"]["release_date"]
             }
             details[str(curr_id)] = entry
+            i += 1
         else:
             print(r)
+
     
     print(f"NUM ENTRIES IN PACKET : {len(details)} / {len(ids)}")
-    dump_file = f"appdetails/appdetails{ids[0]}"
+    dump_file = f"appdetails/appdetails{ids[0]}.json"
     with open(dump_file, 'x') as f:
-        json.dump(details, f)
+        json.dump(details, f, indent=4)
     print(f"DUMPED {dump_file}")
     return
 
@@ -63,6 +71,9 @@ def scrape_appdetails(id_dumps: list[str] = None, batch_limit: int = 999999):
         index += 1
     return
     
+
+if __name__ == "__main__":
+    scrape_appdetails()
 
 
 

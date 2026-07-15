@@ -4,8 +4,8 @@ import time
 
 
 DEFAULT_START_APPID = 0
-DEFAULT_BATCH_SIZE = 10000
-DEFAULT_BATCH_LIMIT = 10
+DEFAULT_BATCH_SIZE = 2
+DEFAULT_BATCH_LIMIT = 3
 
 
 def scrape_at(key: str, start_id: int, batch_size: int) -> int:
