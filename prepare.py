@@ -10,8 +10,30 @@ def prepare():
     if not verify_folder_ready():
         return
     
-    print(get_appdetails())
+    curr_batch = {}
+    first_id = 0
+    appdetails = get_appdetails()
+
+    for details_file in appdetails:
+        with open(details_file, 'r') as f:
+            data = json.load(f)
+            for appid in data:
+                if len(curr_batch) == 0:
+                    first_id = appid
+                curr_batch[appid] = {
+                    "genres": [int(entry["id"]) for entry in data[appid]["genres"]]
+                }
+                if len(curr_batch) >= BATCH_SIZE:
+                    save_batch(curr_batch, first_id)
+                    curr_batch = {}
     
+    if len(curr_batch) > 0:
+        save_batch(curr_batch, first_id)
+    
+    return
+
+
+def save_batch(batch: dict, suffix: int):
     return
 
 
