@@ -29,6 +29,9 @@ def populate_appdetails():
         with open(details_file, 'r') as f:
             data = json.load(f)
             for appid in data:
+                if not isinstance(data[appid]["header_image"], str):
+                    print(f"WARNING: caught entry ({appid}) without valid header image url  --  skipped")
+                    continue
                 if len(curr_batch) == 0:
                     first_id = appid
                 curr_batch[appid] = {
