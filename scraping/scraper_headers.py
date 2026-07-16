@@ -28,6 +28,8 @@ def scrape_at(entries, records: dict[str, str]):
         time.sleep(0.2)
         print(f"GET @{appid}")
         header_url = entries[appid]["header_image"]
+        if not isinstance(header_url, str):
+            print("WARNING: non-str header_url  --  skipped")
         r = requests.get(header_url)
         if r.ok:
             out_path = f"headers/headers{first}/header{appid}.jpg"

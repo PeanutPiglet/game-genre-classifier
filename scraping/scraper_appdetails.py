@@ -23,7 +23,7 @@ def scrape_at(ids: list[int]):
         time.sleep(1.5)
         curr_id = ids[i]
         full_url = f"{base_url}?appids={curr_id}&l=english&filters=basic,categories,genres,release_date"
-        print(f"GET ?appids={curr_id}")
+        print(f"GET ?appids={curr_id}  --  {i + 1} / {n}")
         r = requests.get(full_url)
         if r.ok:
             data = r.json()[str(curr_id)]
