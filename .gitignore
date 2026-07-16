@@ -221,3 +221,5 @@ __marimo__/
 secrets.json
 scraping/**/*.json
 scraping/**/*.jpg
+
+data/**

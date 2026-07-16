@@ -13,6 +13,8 @@ def prepare():
     curr_batch = {}
     first_id = 0
     appdetails = get_appdetails()
+    n = len(appdetails)
+    i = 0
 
     for details_file in appdetails:
         with open(details_file, 'r') as f:
@@ -26,6 +28,9 @@ def prepare():
                 if len(curr_batch) >= BATCH_SIZE:
                     save_batch(curr_batch, first_id)
                     curr_batch = {}
+
+        i += 1
+        print(f"{i} / {n}")
     
     if len(curr_batch) > 0:
         save_batch(curr_batch, first_id)
@@ -34,6 +39,9 @@ def prepare():
 
 
 def save_batch(batch: dict, suffix: int):
+    os.makedirs(f"data/batch{suffix}")
+    with open(f"data/batch{suffix}/appdetails.json", 'x') as f:
+        json.dump(batch, f)
     return
 
 
