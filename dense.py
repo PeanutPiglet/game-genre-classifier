@@ -15,6 +15,11 @@ class NetworkDense(Network):
         self.layers.append(Dense(prev_n, 100))
         self.layers.append(Sigmoid())
 
+    def feedforward(self, inputs):
+        for layer in self.layers:
+            inputs = layer.forward(inputs)
+        return inputs
+
 
 class Dense(Layer):
 
@@ -35,4 +40,5 @@ class Sigmoid(Layer):
     last_output: numpy.ndarray
     def forward(self, inputs):
         self.last_output = 1 / (1 + np.exp(-inputs))
+        return self.last_output
 
