@@ -20,12 +20,19 @@ class NetworkDense(Network):
             inputs = layer.forward(inputs)
         return inputs
 
+    def backprop(self, grad):
+        for i in range(len(self.layers) - 1, -1, -1):
+            grad = self.layers[i].backward(grad)
+        return grad
+
 
 class Dense(Layer):
 
-    weights: numpy.ndarray
-    biases: numpy.ndarray
-    last_input: numpy.ndarray
+    weights: np.ndarray
+    biases: np.ndarray
+    last_input: np.ndarray
+    dC_dW: np.ndarray
+    dC_dB: np.ndarray
 
     def __init__(self, n_layers_in: int, n_layers_out: int):
         self.weights = np.random.randn(n_layers_out, n_layers_in)
@@ -35,10 +42,21 @@ class Dense(Layer):
         self.last_input = inputs
         return self.weights @ inputs + self.biases
 
+    def backward(self, grad):
+        self.dC_dW = grad @ self.last_input.T
+        self.dC_dB = grad
+
+        dC_dA = self.weights.T @ grad
+        return dC_dA
+
 
 class Sigmoid(Layer):
-    last_output: numpy.ndarray
+    last_output: np.ndarray
     def forward(self, inputs):
         self.last_output = 1 / (1 + np.exp(-inputs))
         return self.last_output
+
+    def backward(self, grad):
+        sigmoid_prime = self.last_output * (1 - self.last_output)
+        return sigmoid_prime * grad
 
