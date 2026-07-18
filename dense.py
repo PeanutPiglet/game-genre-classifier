@@ -4,9 +4,11 @@ from common_types import *
 
 class NetworkDense(Network):
     layers: list[Layer]
-    def __init__(self, hidden: list[int], *args, **kwargs):
+    learning_rate: float
+    def __init__(self, hidden: list[int], learning_rate: float = 0.01, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.layers = []
+        self.learning_rate = learning_rate
         prev_n = 460 * 215 * 3
         for curr_n in hidden:
             self.layers.append(Dense(prev_n, curr_n))
@@ -24,6 +26,13 @@ class NetworkDense(Network):
         for i in range(len(self.layers) - 1, -1, -1):
             grad = self.layers[i].backward(grad)
         return grad
+
+    def sgd(self):
+        for i in range(len(self.layers) - 1, -1, -1):
+            curr = self.layers[i]
+            if isinstance(curr, Dense):
+                curr.weights -= curr.dC_dW * self.learning_rate
+                curr.biases -= curr.dC_dB * self.learning_rate
 
 
 class Dense(Layer):
@@ -45,7 +54,6 @@ class Dense(Layer):
     def backward(self, grad):
         self.dC_dW = grad @ self.last_input.T
         self.dC_dB = grad
-
         dC_dA = self.weights.T @ grad
         return dC_dA
 
@@ -59,4 +67,10 @@ class Sigmoid(Layer):
     def backward(self, grad):
         sigmoid_prime = self.last_output * (1 - self.last_output)
         return sigmoid_prime * grad
+
+
+if __name__ == "__main__":
+    X = NetworkDense(name="arc", network_type="dense", hidden=[64, 8])
+    a = np.random.randn(460 * 215 * 3, 1)
+    b = np.random.randn(100, 1)
 
