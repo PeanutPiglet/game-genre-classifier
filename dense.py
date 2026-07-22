@@ -1,4 +1,3 @@
-import numpy
 import numpy as np
 from common_types import *
 
@@ -12,7 +11,7 @@ class NetworkDense(Network):
         prev_n = 460 * 215 * 3
         for curr_n in hidden:
             self.layers.append(Dense(prev_n, curr_n))
-            self.layers.append(Sigmoid())
+            self.layers.append(ReLU())
             prev_n = curr_n
         self.layers.append(Dense(prev_n, 100))
         self.layers.append(Sigmoid())
@@ -44,7 +43,7 @@ class Dense(Layer):
     dC_dB: np.ndarray
 
     def __init__(self, n_layers_in: int, n_layers_out: int):
-        self.weights = np.random.randn(n_layers_out, n_layers_in)
+        self.weights = np.random.randn(n_layers_out, n_layers_in) * 0.01
         self.biases = np.zeros((n_layers_out, 1))
 
     def forward(self, inputs):
@@ -69,8 +68,21 @@ class Sigmoid(Layer):
         return sigmoid_prime * grad
 
 
+class ReLU(Layer):
+    last_input: np.ndarray
+    def forward(self, inputs):
+        self.last_input = inputs
+        return np.maximum(0, inputs)
+
+    def backward(self, grad):
+        grad_input = grad.copy()
+        grad_input[self.last_input <= 0] = 0
+        return grad_input
+
+
 if __name__ == "__main__":
-    X = NetworkDense(name="arc", network_type="dense", hidden=[64, 8])
+    X = NetworkDense(name="arc", network_type="dense", hidden=[1024, 512])
     a = np.random.randn(460 * 215 * 3, 1)
     b = np.random.randn(100, 1)
+    c = np.ones((100, 1))
 
