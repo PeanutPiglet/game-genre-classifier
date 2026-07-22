@@ -4,10 +4,17 @@ from common_types import *
 class NetworkDense(Network):
     layers: list[Layer]
     learning_rate: float
-    def __init__(self, hidden: list[int], learning_rate: float = 0.01, *args, **kwargs):
+    def __init__(self, hidden: list[int] = None, learning_rate: float = 0.01, source: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.layers = []
         self.learning_rate = learning_rate
+
+        if source:
+            self.load(source)
+            return
+
+        if hidden is None:
+            hidden = []
         prev_n = 460 * 215 * 3
         for curr_n in hidden:
             self.layers.append(Dense(prev_n, curr_n))
@@ -32,6 +39,15 @@ class NetworkDense(Network):
             if isinstance(curr, Dense):
                 curr.weights -= curr.dC_dW * self.learning_rate
                 curr.biases -= curr.dC_dB * self.learning_rate
+
+    def dump(self, filepath: str):
+        packed = np.array(self.layers)
+        np.save(filepath, packed)
+
+    def load(self, filepath: str):
+        layers = np.load(filepath, allow_pickle=True)
+        self.layers = list(layers)
+        print(f"{len(self.layers)} layers loaded")
 
 
 class Dense(Layer):

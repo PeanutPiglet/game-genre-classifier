@@ -13,6 +13,11 @@ class Network:
     def backprop(self, grad):
         raise NotImplementedError
 
+    def dump(self, filepath: str):
+        raise NotImplementedError
+
+    def load(self, filepath: str):
+        raise NotImplementedError
 
 class Layer:
     def forward(self, inputs):
