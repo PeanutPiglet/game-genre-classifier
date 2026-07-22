@@ -13,8 +13,8 @@ class NetworkDense(Network):
             self.load(source)
             return
 
-        if hidden is None:
-            hidden = []
+        if not hidden:
+            hidden = [1024, 512]
         prev_n = 460 * 215 * 3
         for curr_n in hidden:
             self.layers.append(Dense(prev_n, curr_n))
