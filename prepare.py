@@ -19,6 +19,8 @@ def prepare():
 
 
 def populate_appdetails():
+    genres = {}
+
     curr_batch = {}
     first_id = 0
     appdetails = get_appdetails()
@@ -37,6 +39,10 @@ def populate_appdetails():
                 curr_batch[appid] = {
                     "genres": [int(entry["id"]) for entry in data[appid]["genres"]]
                 }
+                for entry in data[appid]["genres"]:
+                    if entry["id"] not in genres:
+                        genres[entry["id"]] = entry["description"]
+
                 if len(curr_batch) >= BATCH_SIZE:
                     save_batch(curr_batch, first_id)
                     curr_batch = {}
@@ -46,6 +52,9 @@ def populate_appdetails():
     
     if len(curr_batch) > 0:
         save_batch(curr_batch, first_id)
+
+    with open("data/genres.json", 'x') as f:
+        json.dump(genres, f, indent=4)
     return
 
 
