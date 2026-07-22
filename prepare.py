@@ -62,7 +62,7 @@ def populate_headers():
         print("ERROR: no scraped headers obtained")
         return
     
-    partition.append(999999)
+    partition.append(999999999999)
     curr_i = 0
     curr_val = partition[curr_i]
     threshold = partition[curr_i + 1]
