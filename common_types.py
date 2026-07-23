@@ -13,6 +13,9 @@ class Network:
     def backprop(self, grad):
         raise NotImplementedError
 
+    def sgd(self):
+        raise NotImplementedError
+
     def dump(self, filepath: str):
         raise NotImplementedError
 

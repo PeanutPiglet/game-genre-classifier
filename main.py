@@ -1,5 +1,6 @@
 from common_types import *
 import dense
+import training
 
 
 def main_loop():
@@ -28,6 +29,11 @@ def main_loop():
                 except:
                     print("invalid arguments")
 
+            case 'train':
+                if len(args) < 2:
+                    print("expects at least 2 arguments (name of network, number of epochs)")
+                    continue
+                training.train(NETWORKS[args[0]], int(args[1]))
 
 
 if __name__ == "__main__":
