@@ -66,7 +66,7 @@ def get_batch(batch: str) -> list[str]:
 
 
 def transform_genres_to_vector(genres: list[int]):
-    assert len(genres) > 0
+    # assert len(genres) > 0  # now disabled to allow for genre zero vectors
     vector = np.zeros((100, 1), dtype=np.float32)
     for genre in genres:
         if 0 <= genre < 100:
