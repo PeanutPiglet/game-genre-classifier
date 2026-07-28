@@ -1,9 +1,11 @@
 import os
 import json
-import shutil
+from PIL import Image
 
 
 BATCH_SIZE = 1000
+IMAGE_RESIZE_W = 128
+IMAGE_RESIZE_H = 64
 
 
 def prepare():
@@ -90,12 +92,19 @@ def populate_headers():
                         curr_i += 1
                         threshold = partition[curr_i + 1]
                     curr_val = partition[curr_i]
-                shutil.copy(
+                save_header_transform(
                     f"scraping/headers/headers{curr_val}/header{appid}.jpg",
                     f"{batch_path}/{appid}.jpg"
                 )
         i += 1
         print(f"{i} / {n}")
+    return
+
+
+def save_header_transform(source_file: str, out_file: str):
+    img = Image.open(source_file)
+    img = img.resize((IMAGE_RESIZE_W, IMAGE_RESIZE_H), Image.BILINEAR)
+    img.save(out_file)
     return
 
 
