@@ -59,8 +59,8 @@ class Dense(Layer):
     dC_dB: np.ndarray
 
     def __init__(self, n_layers_in: int, n_layers_out: int):
-        self.weights = np.random.randn(n_layers_out, n_layers_in) * 0.01
-        self.biases = np.zeros((n_layers_out, 1))
+        self.weights = np.random.randn(n_layers_out, n_layers_in).astype(np.float32) * 0.01
+        self.biases = np.zeros((n_layers_out, 1), dtype=np.float32)
 
     def forward(self, inputs):
         self.last_input = inputs

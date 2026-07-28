@@ -40,7 +40,8 @@ def train_epoch(network: Network):
             network.sgd()
 
             j += 1
-            print(f"{j} / {n_entries}")
+            if j % 10 == 0 or j == n_entries:
+                print(f"{j} / {n_entries}")
         i += 1
         print(f"batch {i} / {n}")
     return
@@ -66,34 +67,18 @@ def get_batch(batch: str) -> list[str]:
 
 def transform_genres_to_vector(genres: list[int]):
     assert len(genres) > 0
-    i = 0
-    j = 0
-    vector = []
-    while i < 100:
-        if i == genres[j]:
-            vector.append([1])
-            i += 1
-            j += 1
-            if j >= len(genres):
-                break
-            continue
-        vector.append([0])
-        i += 1
-
-    while i < 100:
-        vector.append([0])
-        i += 1
-
-    return np.asarray(vector)
+    vector = np.zeros((100, 1), dtype=np.float32)
+    for genre in genres:
+        if 0 <= genre < 100:
+            vector[genre, 0] = 1.0
+    return vector
 
 
 def load_image(filepath: str):
-    image = Image.open(filepath)
-    data = np.asarray(image, dtype=float)
-    data = data.flatten()
-    data /= 255
-    data = data.reshape(-1, 1)
-    return data
+    with Image.open(filepath) as image:
+        data = np.asarray(image, dtype=np.float32)
+        data = data.reshape(-1, 1) / 255.0
+        return data
 
 
 
