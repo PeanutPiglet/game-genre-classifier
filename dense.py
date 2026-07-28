@@ -1,6 +1,11 @@
 import numpy as np
 from common_types import *
 
+
+IMAGE_W = 128
+IMAGE_H = 64
+
+
 class NetworkDense(Network):
     layers: list[Layer]
     learning_rate: float
@@ -15,7 +20,7 @@ class NetworkDense(Network):
 
         if not hidden:
             hidden = [1024, 512]
-        prev_n = 460 * 215 * 3
+        prev_n = IMAGE_W * IMAGE_H * 3
         for curr_n in hidden:
             self.layers.append(Dense(prev_n, curr_n))
             self.layers.append(ReLU())
