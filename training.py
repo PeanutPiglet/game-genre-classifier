@@ -6,6 +6,10 @@ import json
 from common_types import *
 
 
+TRAINING_IMAGE_W = 128
+TRAINING_IMAGE_H = 64
+
+
 def train(network: Network, epochs: int):
     begin_time = time.time()
     print(f"starting training with {epochs} epochs at {time.asctime()}")
@@ -22,6 +26,7 @@ def train(network: Network, epochs: int):
 
 
 def train_epoch(network: Network):
+    expected_image_size = TRAINING_IMAGE_W * TRAINING_IMAGE_H * 3
     batches = get_batches()
     n = len(batches)
     i = 0
@@ -30,20 +35,24 @@ def train_epoch(network: Network):
         manifest = get_manifest(batch)
         n_entries = len(manifest)
         print(f"{n_entries} entries")
+        wrong_size_counter = 0
         j = 0
         for appid in manifest:
             image = load_image(os.path.join(batch, f"{appid}.jpg"))
-            res = network.feedforward(image)
-            actual = transform_genres_to_vector(manifest[appid])
-            costs = 2 * (res - actual)
-            network.backprop(costs)
-            network.sgd()
+            if len(image) == expected_image_size:
+                res = network.feedforward(image)
+                actual = transform_genres_to_vector(manifest[appid])
+                costs = 2 * (res - actual)
+                network.backprop(costs)
+                network.sgd()
+            else:
+                wrong_size_counter += 1
 
             j += 1
-            if j % 10 == 0 or j == n_entries:
+            if j % 100 == 0 or j == n_entries:
                 print(f"{j} / {n_entries}")
         i += 1
-        print(f"batch {i} / {n}")
+        print(f"batch {i} / {n}  --  encountered {wrong_size_counter} images of wrong size")
     return
 
 
