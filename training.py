@@ -52,7 +52,7 @@ def train_epoch(network: Network):
             if j % 100 == 0 or j == n_entries:
                 print(f"{j} / {n_entries}")
         i += 1
-        print(f"batch {i} / {n}  --  encountered {wrong_size_counter} images of wrong size")
+        print(f"batch {i} / {n}  --  skipped {wrong_size_counter} images of wrong size")
     return
 
 
