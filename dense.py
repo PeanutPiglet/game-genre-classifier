@@ -4,10 +4,12 @@ from common_types import *
 
 IMAGE_W = 128
 IMAGE_H = 64
+OUTPUT_N = 100
 
 
 class NetworkDense(Network):
     layers: list[Layer]
+    hidden_shape = list[int]
     learning_rate: float
     def __init__(self, hidden: list[int] = None, learning_rate: float = 0.01, source: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,8 +27,12 @@ class NetworkDense(Network):
             self.layers.append(Dense(prev_n, curr_n))
             self.layers.append(ReLU())
             prev_n = curr_n
-        self.layers.append(Dense(prev_n, 100))
+        self.layers.append(Dense(prev_n, OUTPUT_N))
         self.layers.append(Sigmoid())
+        self.hidden_shape = [IMAGE_W * IMAGE_H * 3] + hidden + [OUTPUT_N]
+
+    def __str__(self):
+        return f"{self.name} : {self.network_type} | {self.hidden_shape}"
 
     def feedforward(self, inputs):
         for layer in self.layers:
