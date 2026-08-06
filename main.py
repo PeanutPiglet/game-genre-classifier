@@ -15,8 +15,12 @@ def main_loop():
                 is_running = False
 
             case 'show':
-                for network_name in NETWORKS:
-                    print(network_name, NETWORKS[network_name].network_type)
+                if len(args) == 0:
+                    for network_name in NETWORKS:
+                        print(network_name, NETWORKS[network_name].network_type)
+                    continue
+                network = get_network(args[0])
+                print(network)
 
             case 'create':
                 if len(args) < 1:
@@ -26,6 +30,7 @@ def main_loop():
                     hidden = [int(x) for x in args[1:]]
                     new_network = dense.NetworkDense(name=args[0], network_type='dense', hidden=hidden)
                     NETWORKS[new_network.name] = new_network
+                    print(new_network)
                 except:
                     print("invalid arguments")
 
