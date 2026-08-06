@@ -22,6 +22,9 @@ class Network:
     def load(self, filepath: str):
         raise NotImplementedError
 
+    def evaluate(self):
+        raise NotImplementedError
+
 class Layer:
     def forward(self, inputs):
         raise NotImplementedError

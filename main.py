@@ -40,6 +40,16 @@ def main_loop():
                     continue
                 training.train(NETWORKS[args[0]], int(args[1]))
 
+            case 'run':
+                if len(args) < 2:
+                    print("expects at least 2 arguments (name of network, image path)")
+                    continue
+                network = get_network(args[0])
+                if not network:
+                    print(f"network {args[0]} not found")
+                    continue
+                network.evaluate(args[1])
+
             case 'save':
                 if len(args) < 2:
                     print("expects at least 2 arguments (name of network, save file path)")
