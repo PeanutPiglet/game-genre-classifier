@@ -8,16 +8,17 @@ from common_types import *
 
 TRAINING_IMAGE_W = 128
 TRAINING_IMAGE_H = 64
+DEFAULT_BATCH_SIZE = 32
 
 
-def train(network: Network, epochs: int):
+def train(network: Network, epochs: int, batch_size: int = DEFAULT_BATCH_SIZE):
     begin_time = time.time()
     print(f"starting training with {epochs} epochs at {time.asctime()}")
 
     i = 0
     while i < epochs:
         ttime = time.time()
-        train_epoch(network)
+        train_epoch(network, batch_size=batch_size)
         i += 1
         print(f"epoch {i} / {epochs}  --  taken {int(time.time() - ttime)} seconds")
 
@@ -25,7 +26,7 @@ def train(network: Network, epochs: int):
     return
 
 
-def train_epoch(network: Network):
+def train_epoch(network: Network, batch_size: int = DEFAULT_BATCH_SIZE):
     expected_image_size = TRAINING_IMAGE_W * TRAINING_IMAGE_H * 3
     batches = get_batches()
     n = len(batches)
@@ -38,14 +39,13 @@ def train_epoch(network: Network):
         wrong_size_counter = 0
         j = 0
         last_print_j = j
+        batch_inputs = []
+        batch_targets = []
         for appid in manifest:
             image = load_image(os.path.join(batch, f"{appid}.jpg"))
             if len(image) == expected_image_size:
-                res = network.feedforward(image)
-                actual = transform_genres_to_vector(manifest[appid])
-                costs = 2 * (res - actual)
-                network.backprop(costs)
-                network.sgd()
+                batch_inputs.append(image)
+                batch_targets.append(transform_genres_to_vector(manifest[appid]))
             else:
                 wrong_size_counter += 1
 
@@ -53,8 +53,30 @@ def train_epoch(network: Network):
             if j - last_print_j >= 100 or j == n_entries:
                 last_print_j = j
                 print(f"{j} / {n_entries}")
+
+            if len(batch_inputs) >= batch_size:
+                process_batch(network, batch_inputs, batch_targets)
+                batch_inputs = []
+                batch_targets = []
+
+        if batch_inputs:
+            process_batch(network, batch_inputs, batch_targets)
+
         i += 1
         print(f"batch {i} / {n}  --  skipped {wrong_size_counter} images of wrong size")
+    return
+
+
+def process_batch(network: Network, batch_inputs: list[np.ndarray], batch_targets: list[np.ndarray]):
+    if not batch_inputs:
+        return
+
+    inputs = np.hstack(batch_inputs)
+    targets = np.hstack(batch_targets)
+    res = network.feedforward(inputs)
+    costs = 2 * (res - targets)
+    network.backprop(costs)
+    network.sgd()
     return
 
 
