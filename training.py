@@ -50,17 +50,19 @@ def train_epoch(network: Network, batch_size: int = DEFAULT_BATCH_SIZE):
                 wrong_size_counter += 1
 
             j += 1
-            if j - last_print_j >= 100 or j == n_entries:
-                last_print_j = j
-                print(f"{j} / {n_entries}")
 
             if len(batch_inputs) >= batch_size:
                 process_batch(network, batch_inputs, batch_targets)
                 batch_inputs = []
                 batch_targets = []
+                
+                if j - last_print_j >= 100 or j == n_entries:
+                    last_print_j = j
+                    print(f"{j} / {n_entries}")
 
         if batch_inputs:
             process_batch(network, batch_inputs, batch_targets)
+            print(f"{j} / {n_entries}")
 
         i += 1
         print(f"batch {i} / {n}  --  skipped {wrong_size_counter} images of wrong size")
