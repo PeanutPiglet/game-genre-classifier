@@ -37,6 +37,7 @@ def train_epoch(network: Network):
         print(f"{n_entries} entries")
         wrong_size_counter = 0
         j = 0
+        last_print_j = j
         for appid in manifest:
             image = load_image(os.path.join(batch, f"{appid}.jpg"))
             if len(image) == expected_image_size:
@@ -49,7 +50,8 @@ def train_epoch(network: Network):
                 wrong_size_counter += 1
 
             j += 1
-            if j % 100 == 0 or j == n_entries:
+            if j - last_print_j >= 100 or j == n_entries:
+                last_print_j = j
                 print(f"{j} / {n_entries}")
         i += 1
         print(f"batch {i} / {n}  --  skipped {wrong_size_counter} images of wrong size")
