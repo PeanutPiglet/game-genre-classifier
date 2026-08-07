@@ -87,8 +87,9 @@ class Dense(Layer):
         return self.weights @ inputs + self.biases
 
     def backward(self, grad):
-        self.dC_dW = grad @ self.last_input.T
-        self.dC_dB = grad
+        batch_size = self.last_input.shape[1]
+        self.dC_dW = (grad @ self.last_input.T) / batch_size
+        self.dC_dB = grad.mean(axis=1, keepdims=True)
         dC_dA = self.weights.T @ grad
         return dC_dA
 
