@@ -78,7 +78,7 @@ def process_batch(network: Network, batch_inputs: list[np.ndarray], batch_target
     res = network.feedforward(inputs)
     costs = 2 * (res - targets)
     network.backprop(costs)
-    network.sgd()
+    network.gd_momentum()
     return
 
 

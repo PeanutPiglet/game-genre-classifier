@@ -12,10 +12,12 @@ class NetworkDense(Network):
     layers: list[Layer]
     hidden_shape = list[int]
     learning_rate: float
-    def __init__(self, hidden: list[int] = None, learning_rate: float = 0.01, source: str = "", *args, **kwargs):
+    momentum_factor: float
+    def __init__(self, hidden: list[int] = None, learning_rate: float = 0.01, momentum_factor: float = 0.9, source: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.layers = []
         self.learning_rate = learning_rate
+        self.momentum_factor = momentum_factor
 
         if source:
             self.load(source)
@@ -52,6 +54,21 @@ class NetworkDense(Network):
                 curr.weights -= curr.dC_dW * self.learning_rate
                 curr.biases -= curr.dC_dB * self.learning_rate
 
+    def gd_momentum(self):
+        for i in range(len(self.layers) - 1, -1, -1):
+            curr = self.layers[i]
+            if isinstance(curr, Dense):
+                if curr.last_velocity_w is not None:
+                    curr.last_velocity_w = self.momentum_factor * curr.last_velocity_w + curr.dC_dW * (1 - self.momentum_factor)
+                else:
+                    curr.last_velocity_w = curr.dC_dW * (1 - self.momentum_factor)
+                if curr.last_velocity_b is not None:
+                    curr.last_velocity_b = self.momentum_factor * curr.last_velocity_b + curr.dC_dB * (1 - self.momentum_factor)
+                else:
+                    curr.last_velocity_b = curr.dC_dB * (1 - self.momentum_factor)
+                curr.weights -= curr.last_velocity_w * self.learning_rate
+                curr.biases -= curr.last_velocity_b * self.learning_rate
+
     def dump(self, filepath: str):
         packed = np.array(self.layers)
         np.save(filepath, packed)
@@ -78,9 +95,14 @@ class Dense(Layer):
     dC_dW: np.ndarray
     dC_dB: np.ndarray
 
+    last_velocity_w: np.ndarray
+    last_velocity_b: np.ndarray
+
     def __init__(self, n_layers_in: int, n_layers_out: int):
         self.weights = np.random.randn(n_layers_out, n_layers_in).astype(np.float32) * 0.01
         self.biases = np.zeros((n_layers_out, 1), dtype=np.float32)
+        self.last_velocity_w = None
+        self.last_velocity_b = None
 
     def forward(self, inputs):
         self.last_input = inputs

@@ -16,6 +16,9 @@ class Network:
     def sgd(self):
         raise NotImplementedError
 
+    def gd_momentum(self):
+        raise NotImplementedError
+
     def dump(self, filepath: str):
         raise NotImplementedError
 
