@@ -8,17 +8,17 @@ from common_types import *
 
 TRAINING_IMAGE_W = 128
 TRAINING_IMAGE_H = 64
-DEFAULT_BATCH_SIZE = 32
+MINI_BATCH_SIZE = 32
 
 
-def train(network: Network, epochs: int, batch_size: int = DEFAULT_BATCH_SIZE):
+def train(network: Network, epochs: int, mini_batch_size: int = MINI_BATCH_SIZE):
     begin_time = time.time()
     print(f"starting training with {epochs} epochs at {time.asctime()}")
 
     i = 0
     while i < epochs:
         ttime = time.time()
-        train_epoch(network, batch_size=batch_size)
+        train_epoch(network, mini_batch_size=mini_batch_size)
         i += 1
         print(f"epoch {i} / {epochs}  --  taken {int(time.time() - ttime)} seconds")
 
@@ -26,7 +26,7 @@ def train(network: Network, epochs: int, batch_size: int = DEFAULT_BATCH_SIZE):
     return
 
 
-def train_epoch(network: Network, batch_size: int = DEFAULT_BATCH_SIZE):
+def train_epoch(network: Network, mini_batch_size: int = MINI_BATCH_SIZE):
     expected_image_size = TRAINING_IMAGE_W * TRAINING_IMAGE_H * 3
     batches = get_batches()
     n = len(batches)
@@ -51,7 +51,7 @@ def train_epoch(network: Network, batch_size: int = DEFAULT_BATCH_SIZE):
 
             j += 1
 
-            if len(batch_inputs) >= batch_size:
+            if len(batch_inputs) >= mini_batch_size:
                 process_batch(network, batch_inputs, batch_targets)
                 batch_inputs = []
                 batch_targets = []
