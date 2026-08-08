@@ -10,7 +10,7 @@ OUTPUT_N = 100
 
 class NetworkDense(Network):
     layers: list[Layer]
-    hidden_shape = list[int]
+    hidden_shape: list[list[int]]
     learning_rate: float
     momentum_factor: float
     def __init__(self, hidden: list[int] = None, learning_rate: float = 0.01, momentum_factor: float = 0.9, source: str = "", *args, **kwargs):
@@ -21,18 +21,21 @@ class NetworkDense(Network):
 
         if source:
             self.load(source)
-            return
+        else:
+            if not hidden:
+                hidden = [1024, 512]
+            prev_n = IMAGE_W * IMAGE_H * 3
+            for curr_n in hidden:
+                self.layers.append(Dense(prev_n, curr_n))
+                self.layers.append(ReLU())
+                prev_n = curr_n
+            self.layers.append(Dense(prev_n, OUTPUT_N))
+            self.layers.append(Sigmoid())
 
-        if not hidden:
-            hidden = [1024, 512]
-        prev_n = IMAGE_W * IMAGE_H * 3
-        for curr_n in hidden:
-            self.layers.append(Dense(prev_n, curr_n))
-            self.layers.append(ReLU())
-            prev_n = curr_n
-        self.layers.append(Dense(prev_n, OUTPUT_N))
-        self.layers.append(Sigmoid())
-        self.hidden_shape = [IMAGE_W * IMAGE_H * 3] + hidden + [OUTPUT_N]
+        self.hidden_shape = []
+        for layer in self.layers:
+            if isinstance(layer, Dense):
+                self.hidden_shape.append(layer.weights.shape)
 
     def __str__(self):
         return f"{self.name} : {self.network_type} | {self.hidden_shape}"
