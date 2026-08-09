@@ -1,6 +1,7 @@
 from common_types import *
 import dense
 import training
+import testing
 
 
 def main_loop():
@@ -49,6 +50,16 @@ def main_loop():
                     print(f"network {args[0]} not found")
                     continue
                 network.evaluate(args[1])
+
+            case 'test':
+                if len(args) < 1:
+                    print("expects at least 1 argument (name of network)")
+                    continue
+                network = get_network(args[0])
+                if not network:
+                    print(f"network {args[0]} not found")
+                    continue
+                testing.test(network=network)
 
             case 'save':
                 if len(args) < 2:
