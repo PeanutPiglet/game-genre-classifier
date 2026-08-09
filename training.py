@@ -1,9 +1,8 @@
-from PIL import Image
 import numpy as np
 import os
 import time
-import json
 from common_types import *
+import dataloader
 
 
 TRAINING_IMAGE_W = 128
@@ -28,12 +27,12 @@ def train(network: Network, epochs: int, mini_batch_size: int = MINI_BATCH_SIZE)
 
 def train_epoch(network: Network, mini_batch_size: int = MINI_BATCH_SIZE):
     expected_image_size = TRAINING_IMAGE_W * TRAINING_IMAGE_H * 3
-    batches = get_batches()
+    batches = dataloader.get_batches(directory="data/")
     n = len(batches)
     i = 0
     while i < n:
         batch = batches[i]
-        manifest = get_manifest(batch)
+        manifest = dataloader.get_manifest(batch)
         n_entries = len(manifest)
         print(f"{n_entries} entries")
         wrong_size_counter = 0
@@ -42,10 +41,10 @@ def train_epoch(network: Network, mini_batch_size: int = MINI_BATCH_SIZE):
         batch_inputs = []
         batch_targets = []
         for appid in manifest:
-            image = load_image(os.path.join(batch, f"{appid}.jpg"))
+            image = dataloader.load_image(os.path.join(batch, f"{appid}.jpg"))
             if len(image) == expected_image_size:
                 batch_inputs.append(image)
-                batch_targets.append(transform_genres_to_vector(manifest[appid]))
+                batch_targets.append(dataloader.transform_genres_to_vector(manifest[appid]))
             else:
                 wrong_size_counter += 1
 
@@ -80,43 +79,5 @@ def process_batch(network: Network, batch_inputs: list[np.ndarray], batch_target
     network.backprop(costs)
     network.gd_momentum()
     return
-
-
-def get_manifest(batch: str) -> dict:
-    with open(os.path.join(batch, 'appdetails.json'), 'r') as f:
-        data = json.load(f)
-        manifest = {appid: data[appid]['genres'] for appid in data}
-        return manifest
-
-
-def get_batches() -> list[str]:
-    directory = "data/"
-    batches = [os.path.join(directory, x) for x in os.listdir(directory) if os.path.isdir(os.path.join(directory, x))]
-    return batches
-
-
-def get_batch(batch: str) -> list[str]:
-    paths = [os.path.join(batch, x) for x in os.listdir(batch) if x[-4:] == ".jpg"]
-    return paths
-
-
-def transform_genres_to_vector(genres: list[int]):
-    # assert len(genres) > 0  # now disabled to allow for genre zero vectors
-    vector = np.zeros((100, 1), dtype=np.float32)
-    for genre in genres:
-        if 0 <= genre < 100:
-            vector[genre, 0] = 1.0
-    return vector
-
-
-def load_image(filepath: str):
-    with Image.open(filepath) as image:
-        data = np.asarray(image, dtype=np.float32)
-        data = data.reshape(-1, 1) / 255.0
-        return data
-
-
-
-
 
 
