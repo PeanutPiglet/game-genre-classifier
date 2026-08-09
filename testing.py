@@ -24,7 +24,7 @@ class TestResult:
         self.cost_std = cost_std
         self.wrong_size = wrong_size
     def __str__(self):
-        return f"acc: {self.acc_mean:04d}, {self.acc_std:04d} | costs: {self.cost_mean:04d}, {self.cost_std:04d} | size: {self.n} | skipped: {self.wrong_size}"
+        return f"acc: {self.acc_mean:.4f}, {self.acc_std:.4f} | costs: {self.cost_mean:.4f}, {self.cost_std:.4f} | size: {self.n} | skipped: {self.wrong_size}"
 
 
 def test(network: Network, log_every_batch: bool = True, threshold: float = 0.5) -> TestResult:
@@ -76,7 +76,7 @@ def test_batch(network: Network, batch_path: str, threshold: float = 0.5) -> Tes
                     entry[0] = 1
                 else:
                     entry[0] = 0
-            acc = np.sum(abs(target - binary)) / len(target)
+            acc = 1 - ( np.sum(abs(target - binary)) / len(target) )
             acc_list[n] = acc
             cost = (2 * abs(target - output)).sum() / len(target)
             cost_list[n] = cost
