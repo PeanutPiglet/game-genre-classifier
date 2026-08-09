@@ -2,6 +2,7 @@ from common_types import *
 import dense
 import training
 import testing
+import pytorch_model
 
 
 def main_loop():
@@ -34,6 +35,18 @@ def main_loop():
                     print(new_network)
                 except:
                     print("invalid arguments")
+
+            case 'create_pytorch':
+                if len(args) < 1:
+                    print("expects at least 1 argument (name)")
+                    continue
+                try:
+                    hidden = [int(x) for x in args[1:]]
+                    new_network = pytorch_model.NetworkPyTorch(name=args[0], network_type='pytorch', hidden=hidden)
+                    NETWORKS[new_network.name] = new_network
+                    print(new_network)
+                except Exception as exc:
+                    print("invalid arguments or PyTorch not available:", exc)
 
             case 'train':
                 if len(args) < 2:
@@ -78,6 +91,10 @@ def main_loop():
                 match args[1]:
                     case 'dense':
                         network = dense.NetworkDense(name=args[2], source=args[0], network_type='dense')
+                        if not post_network(network):
+                            print(f"Network name {network.name} already exists in current memory")
+                    case 'pytorch':
+                        network = pytorch_model.NetworkPyTorch(name=args[2], source=args[0], network_type='pytorch')
                         if not post_network(network):
                             print(f"Network name {network.name} already exists in current memory")
                     case _:
