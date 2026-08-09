@@ -223,5 +223,6 @@ scraping/**/*.json
 scraping/**/*.jpg
 
 data/**
+test/**
 
 .idea
