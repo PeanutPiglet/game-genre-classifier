@@ -34,17 +34,19 @@ def transform_genres_to_vector(genres: list[int]):
     return vector
 
 
-def load_image_2d(filepath: str):
+def load_image_2d(filepath: str, resize: bool = False):
     with Image.open(filepath) as image:
         image = image.convert('RGB')
+        if resize:
+            image = image.resize((IMAGE_W, IMAGE_H), Image.BILINEAR)
         data = np.asarray(image, dtype=np.float32) / 255.0
         if data.shape[:2] != (IMAGE_H, IMAGE_W):
             raise ValueError(f"Expected image size {IMAGE_W}x{IMAGE_H}, got {data.shape[1]}x{data.shape[0]}")
         return data.transpose(2, 0, 1)
 
 
-def load_image(filepath: str):
-    data = load_image_2d(filepath)
+def load_image(filepath: str, resize: bool = False):
+    data = load_image_2d(filepath, resize)
     return data.reshape(-1, 1)
 
 
