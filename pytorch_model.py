@@ -93,7 +93,7 @@ class NetworkPyTorch(Network):
     def evaluate(self, image_path):
         from dataloader import load_image
 
-        data = load_image(image_path)
+        data = load_image(image_path, True)
         output = self.feedforward(data)
         res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
         print("\n".join(res))
@@ -172,7 +172,7 @@ class NetworkPyTorchConv(NetworkPyTorch):
     def evaluate(self, image_path):
         from dataloader import load_image_2d
 
-        data = load_image_2d(image_path)
+        data = load_image_2d(image_path, True)
         output = self.feedforward(data)
         res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
         print("\n".join(res))

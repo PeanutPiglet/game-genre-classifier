@@ -83,7 +83,7 @@ class NetworkDense(Network):
         print(f"{len(self.layers)} layers loaded")
 
     def evaluate(self, image_path):
-        data = dataloader.load_image(image_path)
+        data = dataloader.load_image(image_path, True)
         output = self.feedforward(data)
         res = [f"{i:02d} : {output[i]}" for i in range(len(output))]
         print("\n".join(res))
