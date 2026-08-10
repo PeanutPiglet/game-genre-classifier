@@ -1,6 +1,7 @@
 import numpy as np
 from common_types import *
 from PIL import Image
+import dataloader
 
 
 IMAGE_W = 128
@@ -82,12 +83,10 @@ class NetworkDense(Network):
         print(f"{len(self.layers)} layers loaded")
 
     def evaluate(self, image_path):
-        with Image.open(image_path) as image:
-            data = np.asarray(image, dtype=np.float32)
-            data = data.reshape(-1, 1) / 255.0
-            output = self.feedforward(data)
-            res = [f"{i:02d} : {output[i]}" for i in range(len(output))]
-            print("\n".join(res))
+        data = dataloader.load_image(image_path)
+        output = self.feedforward(data)
+        res = [f"{i:02d} : {output[i]}" for i in range(len(output))]
+        print("\n".join(res))
 
 
 class Dense(Layer):
