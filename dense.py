@@ -82,11 +82,17 @@ class NetworkDense(Network):
         self.layers = list(layers)
         print(f"{len(self.layers)} layers loaded")
 
-    def evaluate(self, image_path):
+    def evaluate(self, image_path: str, debug: bool = False, lookup: dict[int, str] = None):
+        if lookup is None:
+            lookup = {}
         data = dataloader.load_image(image_path, True)
         output = self.feedforward(data)
-        res = [f"{i:02d} : {output[i]}" for i in range(len(output))]
-        print("\n".join(res))
+        if debug:
+            res = [f"{i:02d} : {output[i]}" for i in range(len(output))]
+            print("\n".join(res))
+        else:
+            res = [f"{output[k, 0]:.6f} : {lookup[k]}" for k in lookup]
+            print("\n".join(res))
 
 
 class Dense(Layer):

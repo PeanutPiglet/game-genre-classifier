@@ -3,6 +3,7 @@ import dense
 import training
 import testing
 import pytorch_model
+import dataloader
 
 
 def main_loop():
@@ -75,7 +76,9 @@ def main_loop():
                 if not network:
                     print(f"network {args[0]} not found")
                     continue
-                network.evaluate(args[1])
+                debug = len(args) >= 3 and args[2] == "debug"
+                lookup = dataloader.get_genres("data/genres.json", True)
+                network.evaluate(args[1], debug, lookup)
 
             case 'test':
                 if len(args) < 1:

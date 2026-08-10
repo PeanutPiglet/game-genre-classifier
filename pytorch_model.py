@@ -90,13 +90,19 @@ class NetworkPyTorch(Network):
         self.model.load_state_dict(state)
         self.model.to(self.device)
 
-    def evaluate(self, image_path):
+    def evaluate(self, image_path: str, debug: bool = False, lookup: dict[int, str] = None):
         from dataloader import load_image
 
+        if lookup is None:
+            lookup = {}
         data = load_image(image_path, True)
         output = self.feedforward(data)
-        res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
-        print("\n".join(res))
+        if debug:
+            res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
+            print("\n".join(res))
+        else:
+            res = [f"{output[k, 0]:.6f} : {lookup[k]}" for k in lookup]
+            print("\n".join(res))
 
 
 class NetworkPyTorchConv(NetworkPyTorch):
@@ -169,13 +175,19 @@ class NetworkPyTorchConv(NetworkPyTorch):
         self.last_output = torch.sigmoid(logits)
         return self.last_output.detach().cpu().numpy().T
 
-    def evaluate(self, image_path):
+    def evaluate(self, image_path: str, debug: bool = False, lookup: dict[int, str] = None):
         from dataloader import load_image_2d
 
+        if lookup is None:
+            lookup = {}
         data = load_image_2d(image_path, True)
         output = self.feedforward(data)
-        res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
-        print("\n".join(res))
+        if debug:
+            res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
+            print("\n".join(res))
+        else:
+            res = [f"{output[k, 0]:.6f} : {lookup[k]}" for k in lookup]
+            print("\n".join(res))
 
 
 if __name__ == "__main__":

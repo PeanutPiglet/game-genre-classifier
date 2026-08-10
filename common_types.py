@@ -25,7 +25,7 @@ class Network:
     def load(self, filepath: str):
         raise NotImplementedError
 
-    def evaluate(self):
+    def evaluate(self, image_path: str, debug: bool = False, lookup: dict[int, str] = None):
         raise NotImplementedError
 
 class Layer:
