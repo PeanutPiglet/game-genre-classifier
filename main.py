@@ -85,7 +85,10 @@ def main_loop():
                 if not network:
                     print(f"network {args[0]} not found")
                     continue
-                testing.test(network=network)
+                placeholder = False
+                if len(args) >= 2 and args[1] == "true":
+                    placeholder = True
+                testing.test(network=network, placeholder_output=placeholder)
 
             case 'save':
                 if len(args) < 2:
