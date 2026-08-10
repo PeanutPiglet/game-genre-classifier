@@ -27,14 +27,14 @@ class TestResult:
         return f"acc: {self.acc_mean:.4f}, {self.acc_std:.4f} | costs: {self.cost_mean:.4f}, {self.cost_std:.4f} | size: {self.n} | skipped: {self.wrong_size}"
 
 
-def test(network: Network, log_every_batch: bool = True, threshold: float = 0.5) -> TestResult:
+def test(network: Network, log_every_batch: bool = True, threshold: float = 0.5, placeholder_output: bool = False) -> TestResult:
     begin_time = time.time()
     print(f"starting testing at {time.asctime()}")
 
     results: list[TestResult] = []
     batches = dataloader.get_batches(directory="test/")
     for batch_path in batches:
-        res = test_batch(network=network, batch_path=batch_path, threshold=threshold)
+        res = test_batch(network=network, batch_path=batch_path, threshold=threshold, placeholder_output=placeholder_output)
         results.append(res)
         if log_every_batch:
             print(res)
@@ -56,10 +56,13 @@ def test(network: Network, log_every_batch: bool = True, threshold: float = 0.5)
     return collected
 
 
-def test_batch(network: Network, batch_path: str, threshold: float = 0.5) -> TestResult:
+def test_batch(network: Network, batch_path: str, threshold: float = 0.5, placeholder_output: bool = False) -> TestResult:
     manifest = dataloader.get_manifest(batch_path)
     expected_image_size = TESTING_IMAGE_W * TESTING_IMAGE_H * 3
     wrong_size_counter = 0
+
+    if not placeholder_output:
+        genres = dataloader.get_genres("test/genres.json", True)
 
     n = 0
     acc_list = [0] * len(manifest)
@@ -76,10 +79,18 @@ def test_batch(network: Network, batch_path: str, threshold: float = 0.5) -> Tes
                     entry[0] = 1
                 else:
                     entry[0] = 0
-            acc = 1 - ( np.sum(abs(target - binary)) / len(target) )
-            acc_list[n] = acc
-            cost = (2 * abs(target - output)).sum() / len(target)
-            cost_list[n] = cost
+            if placeholder_output:
+                acc = 1 - ( np.sum(abs(target - binary)) / len(target) )
+                acc_list[n] = acc
+                cost = (2 * abs(target - output)).sum() / len(target)
+                cost_list[n] = cost
+            else:
+                acc_diff = abs(target - binary)
+                acc = 1 - ( sum(acc_diff[i, 0] for i in genres) / len(genres) )
+                acc_list[n] = acc
+                cost_diff = 2 * abs(target - output)
+                cost = sum(cost_diff[i, 0] for i in genres) / len(genres)
+                cost_list[n] = cost
             n += 1
         else:
             wrong_size_counter += 1
