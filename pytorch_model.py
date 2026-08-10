@@ -133,19 +133,25 @@ class NetworkPyTorchConv(NetworkPyTorch):
 
     def feedforward(self, inputs):
         np_inputs = np.asarray(inputs, dtype=np.float32)
+        flat_features = IMAGE_W * IMAGE_H * IMAGE_C
 
-        if np_inputs.ndim == 2 and np_inputs.shape[1] == 1 and np_inputs.shape[0] == IMAGE_W * IMAGE_H * IMAGE_C:
+        if np_inputs.ndim == 1 and np_inputs.size == flat_features:
             np_inputs = np_inputs.reshape(IMAGE_H, IMAGE_W, IMAGE_C)
-        elif np_inputs.ndim == 1 and np_inputs.size == IMAGE_W * IMAGE_H * IMAGE_C:
-            np_inputs = np_inputs.reshape(IMAGE_H, IMAGE_W, IMAGE_C)
+
+        if np_inputs.ndim == 2:
+            if np_inputs.shape == (flat_features, 1):
+                np_inputs = np_inputs.reshape(IMAGE_H, IMAGE_W, IMAGE_C)
+            elif np_inputs.shape[0] == flat_features:
+                batch_size = np_inputs.shape[1]
+                np_inputs = np_inputs.T.reshape(batch_size, IMAGE_H, IMAGE_W, IMAGE_C)
+            else:
+                raise ValueError("Expected flattened image tensor shape (features, batch) or (features, 1)")
 
         if np_inputs.ndim == 3:
             if np_inputs.shape == (IMAGE_H, IMAGE_W, IMAGE_C):
                 np_inputs = np_inputs.transpose(2, 0, 1)
             elif np_inputs.shape == (IMAGE_C, IMAGE_H, IMAGE_W):
                 pass
-            elif np_inputs.shape == (IMAGE_H, IMAGE_W, IMAGE_C):
-                np_inputs = np_inputs.transpose(2, 0, 1)
             else:
                 raise ValueError("Expected image shape (C,H,W) or (H,W,C)")
             np_inputs = np_inputs[None, ...]
