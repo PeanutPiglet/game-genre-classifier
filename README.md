@@ -79,10 +79,13 @@ To specify hidden layer sizes, overload them as arguments after <model_name>.
 See model output for a single image:
 
 ```bash
-run <mode_name> <image_file_path>
+run <model_name> <image_file_path>
 ```
 
 Note that this command will auto-resize the input image to match the size specified in `dataloader.py`
+
+To inspect the raw model output, append a `debug` argument at the end:<br/>
+`run <model_name> <image_file_path> debug`
 
 
 ### 4. Train the network
