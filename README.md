@@ -74,7 +74,18 @@ To specify hidden layer sizes, overload them as arguments after <model_name>.
 
 `create heavy 1024 512 128` makes hidden layers: input->1024->512->128->output
 
-### 3. Train the network
+### 3. Evaluate a single image
+
+See model output for a single image:
+
+```bash
+run <mode_name> <image_file_path>
+```
+
+Note that this command will auto-resize the input image to match the size specified in `dataloader.py`
+
+
+### 4. Train the network
 
 Train a model for a number of epochs:
 
@@ -84,20 +95,12 @@ train <model_name> <epochs>
 
 For example, `train my_dense_network 10`.
 
-### 4. Test the network
+### 5. Test the network
 
 Run evaluation on the test dataset:
 
 ```bash
 test <model_name>
-```
-
-### 5. Evaluate a single image
-
-Inspect model output for a single header image:
-
-```bash
-run <mode_name> <image_file_path>
 ```
 
 ### 6. Save and load models
