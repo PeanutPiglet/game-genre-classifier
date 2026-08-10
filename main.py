@@ -47,7 +47,20 @@ def main_loop():
                     print(new_network)
                 except Exception as exc:
                     print("invalid arguments or PyTorch not available:", exc)
-
+            case 'create_pytorch_conv':
+                if len(args) < 1:
+                    print("expects at least 1 argument (name of network)")
+                    continue
+                try:
+                    if len(args) > 1:
+                        hidden = [int(x) for x in args[1:]]
+                    else:
+                        hidden = None
+                    new_network = pytorch_model.NetworkPyTorchConv(name=args[0], network_type='pytorch_conv', hidden=hidden)
+                    NETWORKS[new_network.name] = new_network
+                    print(new_network)
+                except Exception as exc:
+                    print("invalid arguments or PyTorch not available:", exc)
             case 'train':
                 if len(args) < 2:
                     print("expects at least 2 arguments (name of network, number of epochs)")
@@ -95,6 +108,10 @@ def main_loop():
                             print(f"Network name {network.name} already exists in current memory")
                     case 'pytorch':
                         network = pytorch_model.NetworkPyTorch(name=args[2], source=args[0], network_type='pytorch')
+                        if not post_network(network):
+                            print(f"Network name {network.name} already exists in current memory")
+                    case 'pytorch_conv':
+                        network = pytorch_model.NetworkPyTorchConv(name=args[2], source=args[0], network_type='pytorch_conv')
                         if not post_network(network):
                             print(f"Network name {network.name} already exists in current memory")
                     case _:
