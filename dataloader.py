@@ -47,4 +47,15 @@ def load_image(filepath: str):
     data = load_image_2d(filepath)
     return data.reshape(-1, 1)
 
+
+def get_genres(filepath: str, int_key: bool = False) -> dict:
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+        if not isinstance(data, dict):
+            return {}
+        if not int_key:
+            return data
+        transformed = {int(i): data[i] for i in data}
+        return transformed
+
     
