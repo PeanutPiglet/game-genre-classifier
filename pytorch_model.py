@@ -12,6 +12,7 @@ except ImportError as exc:
 
 IMAGE_W = 128
 IMAGE_H = 64
+IMAGE_C = 3
 OUTPUT_N = 100
 
 
@@ -37,7 +38,7 @@ class NetworkPyTorch(Network):
             hidden = [1024, 512]
 
         layers = []
-        input_features = IMAGE_W * IMAGE_H * 3
+        input_features = IMAGE_W * IMAGE_H * IMAGE_C
         for layer_size in hidden:
             layers.append(nn.Linear(input_features, layer_size))
             layers.append(nn.ReLU())
@@ -90,14 +91,85 @@ class NetworkPyTorch(Network):
         self.model.to(self.device)
 
     def evaluate(self, image_path):
-        from PIL import Image
+        from dataloader import load_image
 
-        with Image.open(image_path) as image:
-            data = np.asarray(image, dtype=np.float32)
-            data = data.reshape(-1, 1) / 255.0
-            output = self.feedforward(data)
-            res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
-            print("\n".join(res))
+        data = load_image(image_path)
+        output = self.feedforward(data)
+        res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
+        print("\n".join(res))
+
+
+class NetworkPyTorchConv(NetworkPyTorch):
+    def __init__(self, hidden: list[int] = None, conv_channels: list[int] = None,
+                 learning_rate: float = 0.01, momentum_factor: float = 0.9,
+                 source: str = "", device: str | None = None, *args, **kwargs):
+        self.conv_channels = conv_channels if conv_channels is not None else [16, 32, 64]
+        super().__init__(hidden=hidden, learning_rate=learning_rate, momentum_factor=momentum_factor,
+                         source=source, device=device, *args, **kwargs)
+
+    def _build_model(self, hidden: list[int]):
+        if not hidden:
+            hidden = [512]
+
+        layers = []
+        in_channels = IMAGE_C
+        for out_channels in self.conv_channels:
+            layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1))
+            layers.append(nn.ReLU())
+            layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+            in_channels = out_channels
+
+        pool_factor = 2 ** len(self.conv_channels)
+        flattened_size = in_channels * (IMAGE_W // pool_factor) * (IMAGE_H // pool_factor)
+        layers.append(nn.Flatten())
+
+        for layer_size in hidden:
+            layers.append(nn.Linear(flattened_size, layer_size))
+            layers.append(nn.ReLU())
+            flattened_size = layer_size
+
+        layers.append(nn.Linear(flattened_size, OUTPUT_N))
+        self.model = nn.Sequential(*layers).to(self.device)
+
+    def feedforward(self, inputs):
+        np_inputs = np.asarray(inputs, dtype=np.float32)
+
+        if np_inputs.ndim == 2 and np_inputs.shape[1] == 1 and np_inputs.shape[0] == IMAGE_W * IMAGE_H * IMAGE_C:
+            np_inputs = np_inputs.reshape(IMAGE_H, IMAGE_W, IMAGE_C)
+        elif np_inputs.ndim == 1 and np_inputs.size == IMAGE_W * IMAGE_H * IMAGE_C:
+            np_inputs = np_inputs.reshape(IMAGE_H, IMAGE_W, IMAGE_C)
+
+        if np_inputs.ndim == 3:
+            if np_inputs.shape == (IMAGE_H, IMAGE_W, IMAGE_C):
+                np_inputs = np_inputs.transpose(2, 0, 1)
+            elif np_inputs.shape == (IMAGE_C, IMAGE_H, IMAGE_W):
+                pass
+            elif np_inputs.shape == (IMAGE_H, IMAGE_W, IMAGE_C):
+                np_inputs = np_inputs.transpose(2, 0, 1)
+            else:
+                raise ValueError("Expected image shape (C,H,W) or (H,W,C)")
+            np_inputs = np_inputs[None, ...]
+        elif np_inputs.ndim == 4:
+            if np_inputs.shape[1] != IMAGE_C and np_inputs.shape[-1] == IMAGE_C:
+                np_inputs = np_inputs.transpose(0, 3, 1, 2)
+        else:
+            raise ValueError("Expected 2D flattened input, 3D image tensor, or 4D image batch")
+
+        tensor = torch.from_numpy(np_inputs).to(self.device)
+        tensor.requires_grad_(True)
+        self.last_input = tensor
+
+        logits = self.model(tensor)
+        self.last_output = torch.sigmoid(logits)
+        return self.last_output.detach().cpu().numpy().T
+
+    def evaluate(self, image_path):
+        from dataloader import load_image_2d
+
+        data = load_image_2d(image_path)
+        output = self.feedforward(data)
+        res = [f"{i:02d} : {output[i, 0]:.6f}" for i in range(output.shape[0])]
+        print("\n".join(res))
 
 
 if __name__ == "__main__":

@@ -3,6 +3,10 @@ import os
 import json
 import numpy as np
 
+IMAGE_W = 128
+IMAGE_H = 64
+IMAGE_C = 3
+
 
 def get_manifest(batch: str) -> dict:
     with open(os.path.join(batch, 'appdetails.json'), 'r') as f:
@@ -30,10 +34,17 @@ def transform_genres_to_vector(genres: list[int]):
     return vector
 
 
-def load_image(filepath: str):
+def load_image_2d(filepath: str):
     with Image.open(filepath) as image:
-        data = np.asarray(image, dtype=np.float32)
-        data = data.reshape(-1, 1) / 255.0
-        return data
+        image = image.convert('RGB')
+        data = np.asarray(image, dtype=np.float32) / 255.0
+        if data.shape[:2] != (IMAGE_H, IMAGE_W):
+            raise ValueError(f"Expected image size {IMAGE_W}x{IMAGE_H}, got {data.shape[1]}x{data.shape[0]}")
+        return data.transpose(2, 0, 1)
+
+
+def load_image(filepath: str):
+    data = load_image_2d(filepath)
+    return data.reshape(-1, 1)
 
     
