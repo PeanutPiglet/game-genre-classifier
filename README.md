@@ -4,7 +4,7 @@ A Python neural network project that predicts game genres based on header images
 
 ## Overview
 
-The goal of this project is to build a pipeline for reading game header images, extracting pixel data, and predicting game genres from that visual input. It is motivated as an introductory learning experience. The repository includes:
+The goal of this project is to build a pipeline for reading game header images, extracting pixel data, and predicting game genres from that visual input. It is motivated as an introductory learning experience. Game developers can also use this to assess perceived game genres based on their artworks. The repository includes:
 
 - `main.py` — interactive CLI interface to create, train, test, save, and load models
 - `dense.py` — a custom dense neural network implementation
@@ -70,9 +70,9 @@ create_pytorch_conv <model_name>
 
 To specify hidden layer sizes, overload them as arguments after <model_name>.
 
-`create light 512 256` makes hidden layers: input->512->256->output
+`create light 512 256` makes a model named "light" with hidden layers: input->512->256->output
 
-`create heavy 1024 512 128` makes hidden layers: input->1024->512->128->output
+`create heavy 1024 512 128` makes a model named "heavy" with hidden layers: input->1024->512->128->output
 
 ### 3. Evaluate a single image
 
@@ -106,6 +106,12 @@ Run evaluation on the test dataset:
 test <model_name>
 ```
 
+This will evaluate on channels of the output vector which have corresponding genre keys in `test/genres.json`.
+
+To evaluate on all channels (currently there are 100 channels), append the `placeholder` flag:
+
+`test <model_name> placeholder`
+
 ### 6. Save and load models
 
 Save a network to disk:
@@ -120,9 +126,9 @@ Load a saved model into memory:
 load <save_file_path> <network_type> <model_name>
 ```
 
-`<network_type>` is either <br>
-`dense` — custom dense model
-`pytorch` — PyTorch dense model
+`<network_type>` is either <br/>
+`dense` — custom dense model <br/>
+`pytorch` — PyTorch dense model <br/>
 `pytorch-conv` — PyTorch convolution model
 
 ### 7. Manage networks
