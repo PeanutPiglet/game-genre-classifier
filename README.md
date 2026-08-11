@@ -1,19 +1,21 @@
-# Header to Game Stats
+# Game Genre Classifer 🖼️
 
-A Python neural network project that predicts game genres based on header images. This repository contains both a custom dense network implementation and PyTorch models, including a convolutional network.
+A Python **neural network** project that predicts **game genres based on header images**. This repository contains both a *custom dense network* implementation and PyTorch models, including a convolutional network.
 
-## Overview
+[✅ Quick Start](#quick-start)
+
+## Overview 💡
 
 The goal of this project is to build a pipeline for reading game header images, extracting pixel data, and predicting game genres from that visual input. It is motivated as an introductory learning experience. Game developers can also use this to assess perceived game genres based on their artworks. The repository includes:
 
-- `main.py` — interactive CLI interface to create, train, test, save, and load models
+- `main.py` — **interactive CLI** interface to create, train, test, save, and load models
 - `dense.py` — a custom dense neural network implementation
 - `pytorch_model.py` — a PyTorch-based neural network implementation with dense and 2D convolutional variants
 - `training.py` — training loop for networks over the dataset
 - `testing.py` — evaluation loop for test batches
 - `dataloader.py` — image loading, batch discovery, and genre label transformation
 
-## Project Structure
+## Project Structure 🗂️
 
 - `data/` — training image batches and metadata
 - `test/` — test batches used by `testing.py`
@@ -22,7 +24,7 @@ The goal of this project is to build a pipeline for reading game header images, 
 - `common_types.py` — abstract network interface definitions
 - `README.md` — project documentation
 
-## Requirements
+## Requirements 🔒
 
 This project requires Python 3.11+ and the following packages:
 
@@ -38,7 +40,7 @@ pip install numpy pillow torch
 
 Install PyTorch with instructions from the [official website](https://pytorch.org/get-started/locally/) to get the most out of the PyTorch models (e.g. hardware acceleration).
 
-## Quick Start
+## Quick Start ✅
 
 ### 1. Run the interactive CLI
 
@@ -154,12 +156,12 @@ Stop the CLI:
 stop
 ```
 
-## Notes
+## Notes 📄
 
 - Images are expected to be `128 x 64` pixels with RGB channels. To adjust this, change the global constants in the Python modules.
 - `dataloader.py` provides `load_image_2d` for convolutional inputs and `load_image` for flattened inputs.
 
-## Scraping & Preparation
+## Scraping & Preparation 📁⇄📁
 
 This repository does not include training or test data by default. The dataset is created from Steam metadata and header images using the scripts in `scraping/`, then packaged into model-ready batches by `prepare.py`.
 
@@ -212,6 +214,6 @@ The folder must contain sub-folders of images (of appropriate size for the model
 
 Ensure a `genres.json` dictionary of genres by their number code exists in `test/`. This can also be copied from the genereted `data/genres.json` after running `prepare.py` on scraped data.
 
-## Results
+## Results 🤩😅
 
 *COMING SOON*
