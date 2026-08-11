@@ -161,7 +161,48 @@ stop
 
 ## Scraping & Preparation
 
+This repository does not include training or test data by default. The dataset is created from Steam metadata and header images using the scripts in `scraping/`, then packaged into model-ready batches by `prepare.py`.
 
+### Data scraping workflow
+
+1. `scraping/scraper_appids.py`
+   - Uses the Steam partner API to collect app ID batches. See [Steam's documentation](https://partner.steamgames.com/doc/webapi_overview/auth) on obtaining a publisher key.
+   - Reads the publisher key from `../secrets.json` and saves results in `scraping/appids/appids<start_id>.json`.
+   - These files provide the app IDs used for fetching Steam app details in the next step.
+
+2. `scraping/scraper_appdetails.py`
+   - Reads each app ID batch and requests app details from Steam’s public `appdetails` API.
+   - Keeps only entries where the Steam app is a game and extracts `name`, `header_image`, `genres`, `categories`, and `release_date`.
+   - Saves each detail batch to `scraping/appdetails/appdetails<first_appid>.json`.
+
+3. `scraping/scraper_headers.py`
+   - Downloads header images from `header_image` URLs found in the app details.
+   - Stores images under `scraping/headers/headers<first_appid>/header<appid>.jpg`.
+   - The script includes a short delay between requests to avoid overloading the Steam servers.
+
+### Data preparation workflow
+
+1. `prepare.py`
+   - Verifies that `scraping/appdetails/`, `scraping/headers/`, and an empty `data/` directory exist.
+   - Runs `populate_appdetails()` to convert scraped metadata into batches of up to 1000 apps (adjustable in the script).
+   - Writes batch metadata as `data/batch<suffix>/appdetails.json`.
+   - Builds `data/genres.json` containing genre ID-to-description mappings.
+
+2. Header images
+   - `prepare.py` also resizes and copies scraped header images into the prepared batch folders.
+   - Images are resized to `128 x 64` using bilinear interpolation to match the model input expectations. This can be adjusted; see important notes below.
+   - Header files are placed into the same batch partition as their corresponding app metadata.
+
+### Important notes
+
+- `prepare.py` requires `data/` to be empty before running, and it will refuse to continue if the folder already contains files or directories.
+- If you change the image shape in `prepare.py`, update the model input handling in `dataloader.py`, `dense.py`, and `pytorch_model.py` to match.
+- The scraping scripts assume a working Steam partner API key is stored in `secrets.json` as
+```json
+{
+    "steam-publisher-key": "<your_key>"
+}
+```
 
 ## Results
 
