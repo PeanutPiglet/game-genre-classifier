@@ -36,7 +36,7 @@ Install dependencies with:
 pip install numpy pillow torch
 ```
 
-Install PyTorch with instructions from the official website to get the most out of the PyTorch models (e.g. hardware acceleration).
+Install PyTorch with instructions from the [official website](https://pytorch.org/get-started/locally/) to get the most out of the PyTorch models (e.g. hardware acceleration).
 
 ## Quick Start
 
@@ -98,6 +98,8 @@ train <model_name> <epochs>
 
 For example, `train my_dense_network 10`.
 
+No training data is included in the repository source code. Refer to the [Scraping & Preparation](#scraping--preparation) section to obtain data.
+
 ### 5. Test the network
 
 Run evaluation on the test dataset:
@@ -110,6 +112,8 @@ This will evaluate on channels of the output vector which have corresponding gen
 
 To evaluate on all channels (currently there are 100 channels), append the `placeholder` flag:<br/>
 `test <model_name> placeholder`
+
+Similar to training data, no testing data is provided in the repository. Refer to the [Scraping & Preparation](#scraping--preparation) section.
 
 ### 6. Save and load models
 
@@ -154,6 +158,10 @@ stop
 
 - Images are expected to be `128 x 64` pixels with RGB channels. To adjust this, change the global constants in the Python modules.
 - `dataloader.py` provides `load_image_2d` for convolutional inputs and `load_image` for flattened inputs.
+
+## Scraping & Preparation
+
+
 
 ## Results
 
