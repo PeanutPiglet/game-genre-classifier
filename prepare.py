@@ -115,7 +115,7 @@ def verify_folder_ready():
             return False
 
     if not os.path.exists("data") or not os.path.isdir("data"):
-        print("ERROR: ./data folder not found")
+        print("ERROR: ./data folder not found  --  please create folder 'data/' in root directory")
         return False
     with os.scandir("data") as folder:
         if any(folder):

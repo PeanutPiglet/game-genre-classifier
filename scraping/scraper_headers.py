@@ -46,6 +46,8 @@ def scrape_headers(appdetails: list[str] = None, limit: int = 999999) -> dict[st
     if not appdetails:
         appdetails = get_all_appdetails()
 
+    os.makedirs("headers/", exist_ok=True)
+
     records = {}
     index = 0
     while index < len(appdetails) and index < limit:

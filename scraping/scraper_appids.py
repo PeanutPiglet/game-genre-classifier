@@ -1,6 +1,7 @@
 import json
 import requests
 import time
+import os
 
 
 DEFAULT_START_APPID = 0
@@ -38,6 +39,8 @@ def scrape_appids(start_id: int = DEFAULT_START_APPID,
     with open("../secrets.json") as f:
         secrets = json.load(f)
     publisher_key = secrets["steam-publisher-key"]
+
+    os.makedirs("appids/", exist_ok=True)
 
     last_id = start_id
     dumps = []

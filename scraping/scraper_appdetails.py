@@ -72,6 +72,8 @@ def scrape_appdetails(id_dumps: list[str] = None, limit: int = 999999):
     if not id_dumps:
         id_dumps = get_all_dumps()
 
+    os.makedirs("appdetails/", exist_ok=True)
+
     index = 0
     while index < len(id_dumps) and index < limit:
         curr = id_dumps[index]
