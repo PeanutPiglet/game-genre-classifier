@@ -2,7 +2,7 @@
 
 A Python **neural network** project that predicts **game genres based on header images**. This repository contains both a *custom dense network* implementation and PyTorch models, including a convolutional network.
 
-[✅ Quick Start](#quick-start)
+[✅ Quick Start](#quick-start-)
 
 ## Overview 💡
 
