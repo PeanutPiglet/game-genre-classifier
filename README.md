@@ -204,6 +204,14 @@ This repository does not include training or test data by default. The dataset i
 }
 ```
 
+### Testing data workflow
+
+Testing data are used for the `test` command in the main program and stored in the `test/` folder.
+
+The folder must contain sub-folders of images (of appropriate size for the model) with genre metadata. Most conveniently, move some of the batches (folders) of images in the prepared `data/` folder into the `test` folder. They share the same structure. 
+
+Ensure a `genres.json` dictionary of genres by their number code exists in `test/`. This can also be copied from the genereted `data/genres.json` after running `prepare.py` on scraped data.
+
 ## Results
 
 *COMING SOON*
