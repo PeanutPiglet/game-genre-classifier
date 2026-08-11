@@ -108,8 +108,7 @@ test <model_name>
 
 This will evaluate on channels of the output vector which have corresponding genre keys in `test/genres.json`.
 
-To evaluate on all channels (currently there are 100 channels), append the `placeholder` flag:
-
+To evaluate on all channels (currently there are 100 channels), append the `placeholder` flag:<br/>
 `test <model_name> placeholder`
 
 ### 6. Save and load models
