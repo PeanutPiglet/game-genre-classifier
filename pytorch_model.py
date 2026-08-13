@@ -115,7 +115,7 @@ class NetworkPyTorchConv(NetworkPyTorch):
 
     def _build_model(self, hidden: list[int]):
         if not hidden:
-            hidden = [512]
+            hidden = [1024, 512]
 
         layers = []
         in_channels = IMAGE_C
