@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import time
+import random
 from common_types import *
 import dataloader
 
@@ -28,6 +29,7 @@ def train(network: Network, epochs: int, mini_batch_size: int = MINI_BATCH_SIZE)
 def train_epoch(network: Network, mini_batch_size: int = MINI_BATCH_SIZE):
     expected_image_size = TRAINING_IMAGE_W * TRAINING_IMAGE_H * 3
     batches = dataloader.get_batches(directory="data/")
+    random.shuffle(batches)
     n = len(batches)
     i = 0
     while i < n:
@@ -40,7 +42,9 @@ def train_epoch(network: Network, mini_batch_size: int = MINI_BATCH_SIZE):
         last_print_j = j
         batch_inputs = []
         batch_targets = []
-        for appid in manifest:
+        appids = list(manifest.keys())
+        random.shuffle(appids)
+        for appid in appids:
             image = dataloader.load_image(os.path.join(batch, f"{appid}.jpg"))
             if len(image) == expected_image_size:
                 batch_inputs.append(image)
