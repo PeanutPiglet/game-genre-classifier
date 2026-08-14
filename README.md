@@ -128,13 +128,18 @@ save <model_name> <save_file_path>
 Load a saved model into memory:
 
 ```bash
-load <save_file_path> <network_type> <model_name>
+load <save_file_path> <network_type> <model_name> <hidden_layers>
 ```
 
 `<network_type>` is either <br/>
 `dense` — custom dense model <br/>
 `pytorch` — PyTorch dense model <br/>
 `pytorch-conv` — PyTorch convolution model
+
+`<hidden_layers>` is the sizes of the hidden layers of the model in order and delimited by space.<br/>
+For example, `load <save_file_path> <network_type> <model_name> 1024 512`.
+
+The layer sizes must match the saved model's layer sizes exactly.
 
 ### 7. Manage networks
 
