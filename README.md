@@ -221,4 +221,21 @@ Ensure a `genres.json` dictionary of genres by their number code exists in `test
 
 ## Results 🤩😅
 
-*COMING SOON*
+Simple exploratory tests were done on different models. The purpose for this is mostly a sanity check on model performance and validity, and we advise against interpreting them as representative of model settings.
+
+The models are trained on 500,000 header images and metadata scraped from the public Steam api, following the procedure in [Scraping & Preparation](#scraping--preparation-). The testing images are 4,000 additional headers scraped similarly.
+
+### Training Specs:
+
+* Intel Core i7-9700 CPU @ 3.00GHz
+* 32GB DDR4 RAM
+* 512GB RAID SSD
+* NVIDIA GeForce RTX 2060 with 6GB VRAM (for PyTorch CUDA)
+
+### Raw Data
+The following table summarizes the results.
+
+
+
+
+
