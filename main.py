@@ -105,17 +105,18 @@ def main_loop():
                 if len(args) < 3:
                     print("expects at least 3 arguments (savefile path, network type, network name)")
                     continue
+                hidden = [int(x) for x in args[3:]]
                 match args[1]:
                     case 'dense':
-                        network = dense.NetworkDense(name=args[2], source=args[0], network_type='dense')
+                        network = dense.NetworkDense(name=args[2], source=args[0], network_type='dense', hidden=hidden)
                         if not post_network(network):
                             print(f"Network name {network.name} already exists in current memory")
                     case 'pytorch':
-                        network = pytorch_model.NetworkPyTorch(name=args[2], source=args[0], network_type='pytorch')
+                        network = pytorch_model.NetworkPyTorch(name=args[2], source=args[0], network_type='pytorch', hidden=hidden)
                         if not post_network(network):
                             print(f"Network name {network.name} already exists in current memory")
                     case 'pytorch_conv':
-                        network = pytorch_model.NetworkPyTorchConv(name=args[2], source=args[0], network_type='pytorch_conv')
+                        network = pytorch_model.NetworkPyTorchConv(name=args[2], source=args[0], network_type='pytorch_conv', hidden=hidden)
                         if not post_network(network):
                             print(f"Network name {network.name} already exists in current memory")
                     case _:
