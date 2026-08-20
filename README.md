@@ -4,6 +4,8 @@ A Python **neural network** project that predicts **game genres based on header 
 
 [✅ Quick Start](#quick-start-)
 
+[🤩 Results](#results-)
+
 ## Overview 💡
 
 The goal of this project is to build a pipeline for reading game header images, extracting pixel data, and predicting game genres from that visual input. It is motivated as an introductory learning experience. Game developers can also use this to assess perceived game genres based on their artworks. The repository includes:
