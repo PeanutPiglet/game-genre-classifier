@@ -223,9 +223,15 @@ Ensure a `genres.json` dictionary of genres by their number code exists in `test
 
 Simple exploratory tests were done on different models. The purpose for this is mostly a sanity check on model performance and correctness. With consideration for statistical validity, we advise against interpreting the results as representative data.
 
-The models are trained on 500,000 header images and metadata scraped from the public Steam api, following the procedure in [Scraping & Preparation](#scraping--preparation-). The testing images are 4,000 additional headers scraped similarly.
+Nevertheless, we observe significantly faster training times with PyTorch models, given that they use optimized tensors for ML and runs on CUDA cores. All models appear to be stuck at around 90% accuracy. Particularly, models seem to converge well towards their optimums with just one epoch. One outlier is the heavy PyTorch dense network, which had a much lower accuracy than the others.
+
+To examine whether the models were stuck because of over-fitting, we ran additional tests on the highest-epoch saves of each model, marked with an asterisk. Specifically, we sampled from the training data set and hypothesized a higher accuracy if over-fitting is indeed happening. However, no clear differences were observed. Now, a plausible explanation would be that the models are all simply stuck in a local optimum in the optimization landscape. Future training could use different optimizers and hyper-parameters to escape the possible locality. 
+
+Also notice that the false negative (FN) and false positive (FP) rates comparative proportions vary across models. The custom dense models appears to usual have higher false negative rates; during testing, this trend was observed as well, though unrecorded. Whether they are statistically significant, and whether there is a causal relation somewhere, is unknown at this time.
 
 ### Training Specs:
+
+The models are trained on 500,000 header images and metadata scraped from the public Steam api, following the procedure in [Scraping & Preparation](#scraping--preparation-). The testing images are 4,000 additional headers scraped similarly.
 
 * Intel Core i7-9700 CPU @ 3.00GHz
 * 32GB DDR4 RAM
@@ -242,12 +248,14 @@ The following table summarizes the results.
 |                                         | 2     | 0.9256   | 0.0393  | 0.0151  | 0.0593  | 0.2000    | 0.0559   | 441 s         |
 |                                         | 5     | 0.9260   | 0.0417  | 0.0198  | 0.0543  | 0.2152    | 0.0470   | 1097 s        |
 |                                         | 10    | 0.9260   | 0.0396  | 0.0125  | 0.0616  | 0.2109    | 0.0461   | 2188 s        |
+|                                         | 10*   | 0.9296   | 0.0371  | 0.0150  | 0.0554  | 0.2054    | 0.0435   | 2188 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | Dense [1024, 512] Momentum              | 0     | 0.4775   | 0.0614  | 0.4749  | 0.0476  | 1.0017    | 0.0015   | 0 s           |
 |                                         | 1     | 0.9248   | 0.0378  | 0.0086  | 0.0666  | 0.1527    | 0.0770   | 347 s         |
 |                                         | 2     | 0.9117   | 0.0403  | 0.0000  | 0.0883  | 0.1788    | 0.0816   | 691 s         |
 |                                         | 5     | 0.9248   | 0.0378  | 0.0086  | 0.0666  | 0.1539    | 0.0745   | 1723 s        |
 |                                         | 10    | 0.9244   | 0.0418  | 0.0234  | 0.0523  | 0.1965    | 0.0534   | 3427 s        |
+|                                         | 10*   | 0.9263   | 0.0405  | 0.0273  | 0.0463  | 0.1942    | 0.0508   | 3427 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | PyTorch [1024, 512] SGD                 | 0     | 0.5684   | 0.0638  | 0.3697  | 0.0620  | 0.9980    | 0.0025   | 0 s           |
 |                                         | 1     | 0.8581   | 0.0371  | 0.1026  | 0.0394  | 0.2839    | 0.0743   | 25 s          |
@@ -255,6 +263,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.9001   | 0.0473  | 0.0664  | 0.0335  | 0.1997    | 0.0946   | 126 s         |
 |                                         | 10    | 0.9209   | 0.0409  | 0.0257  | 0.0534  | 0.1583    | 0.0819   | 253 s         |
 |                                         | 100   | 0.9072   | 0.0439  | 0.0174  | 0.0754  | 0.1857    | 0.0878   | 2583 s        |
+|                                         | 100*  | 0.9082   | 0.0407  | 0.0169  | 0.0749  | 0.1854    | 0.0874   | 2583 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | PyTorch [1024, 512] Momentum            | 0     | 0.4924   | 0.0579  | 0.4700  | 0.0376  | 0.9983    | 0.0024   | 0 s           |
 |                                         | 1     | 0.9047   | 0.0370  | 0.0489  | 0.0464  | 0.1906    | 0.0740   | 25 s          |
@@ -262,6 +271,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.8987   | 0.0421  | 0.0671  | 0.0342  | 0.2026    | 0.0842   | 123 s         |
 |                                         | 10    | 0.9051   | 0.0440  | 0.0336  | 0.0613  | 0.1899    | 0.0879   | 247 s         |
 |                                         | 100   | 0.8870   | 0.0455  | 0.0578  | 0.0552  | 0.2260    | 0.0910   | 2473 s        |
+|                                         | 100*  | 0.8891   | 0.0446  | 0.0563  | 0.0546  | 0.2211    | 0.0895   | 2473 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | Conv [1024, 512] SGD                    | 0     | 0.5392   | 0.0408  | 0.4091  | 0.0517  | 0.9988    | 0.0013   | 0 s           |
 |                                         | 1     | 0.9221   | 0.0401  | 0.0251  | 0.0528  | 0.1557    | 0.0803   | 27 s          |
@@ -269,6 +279,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.9164   | 0.0417  | 0.0431  | 0.0405  | 0.1673    | 0.0834   | 136 s         |
 |                                         | 10    | 0.8806   | 0.0448  | 0.0913  | 0.0281  | 0.2387    | 0.0897   | 273 s         |
 |                                         | 100   | 0.9006   | 0.0410  | 0.0510  | 0.0484  | 0.1989    | 0.0821   | 2743 s        |
+|                                         | 100*  | 0.9013   | 0.0403  | 0.0555  | 0.0432  | 0.1974    | 0.0805   | 2743 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | Conv [1024, 512] Momentum               | 0     | 0.6236   | 0.0412  | 0.3392  | 0.0372  | 0.9958    | 0.0010   | 0 s           |
 |                                         | 1     | 0.9117   | 0.0403  | 0.0000  | 0.0883  | 0.1767    | 0.0806   | 28 s          |
@@ -276,6 +287,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.9221   | 0.0401  | 0.0251  | 0.0528  | 0.1557    | 0.0803   | 138 s         |
 |                                         | 10    | 0.9209   | 0.0409  | 0.0257  | 0.0534  | 0.1583    | 0.0819   | 281 s         |
 |                                         | 100   | 0.9209   | 0.0409  | 0.0257  | 0.0534  | 0.1583    | 0.0819   | 2721 s        |
+|                                         | 100*  | 0.9240   | 0.0407  | 0.0290  | 0.0470  | 0.1520    | 0.0815   | 2721 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | PyTorch [8192, 2048, 512] Momentum      | 0     | 0.5012   | 0.0567  | 0.4542  | 0.0447  | 1.0021    | 0.0012   | 0 s           |
 |                                         | 1     | 0.8856   | 0.0401  | 0.0585  | 0.0559  | 0.2288    | 0.0802   | 63 s          |
@@ -283,6 +295,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.8540   | 0.0409  | 0.0894  | 0.0566  | 0.2920    | 0.0817   | 317 s         |
 |                                         | 10    | 0.8895   | 0.0380  | 0.0414  | 0.0691  | 0.2210    | 0.0760   | 637 s         |
 |                                         | 100   | 0.8396   | 0.0395  | 0.1118  | 0.0486  | 0.3208    | 0.0790   | 6316 s        |
+|                                         | 100*  | 0.8451   | 0.0305  | 0.1099  | 0.0450  | 0.3202    | 0.0791   | 6316 s        |
 |                                         |       |          |         |         |         |           |          |               |
 | Conv [8192, 2048, 512] Momentum         | 0     | 0.4869   | 0.0405  | 0.4551  | 0.0580  | 1.0008    | 0.0012   | 0 s           |
 |                                         | 1     | 0.8831   | 0.0375  | 0.0749  | 0.0420  | 0.2338    | 0.0750   | 32 s          |
@@ -290,4 +303,7 @@ The following table summarizes the results.
 |                                         | 5     | 0.8871   | 0.0399  | 0.0578  | 0.0552  | 0.2259    | 0.0797   | 157 s         |
 |                                         | 10    | 0.8409   | 0.0367  | 0.1263  | 0.0328  | 0.3183    | 0.0734   | 316 s         |
 |                                         | 100   | 0.9006   | 0.0410  | 0.0510  | 0.0484  | 0.1989    | 0.0821   | 3159 s        |
+|                                         | 100*  | 0.9013   | 0.0403  | 0.0555  | 0.0432  | 0.1974    | 0.0805   | 3159 s        |
+
+*testing on training set sample
 
